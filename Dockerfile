@@ -1,3 +1,4 @@
+# Salt become available after quantal.
 FROM ubuntu:quantal
 RUN echo "deb http://www.apache.org/dist/cassandra/debian 11x main" > /etc/apt/sources.list
 RUN echo "deb-src http://www.apache.org/dist/cassandra/debian 11x main" >> /etc/apt/sources.list
@@ -12,14 +13,20 @@ RUN bash -c "gpg --export --armor 2B5C1B00 | apt-key add -"
 RUN echo "deb http://www.duinsoft.nl/pkg debs all" >> /etc/apt/sources.list
 RUN apt-key adv --keyserver keys.gnupg.net --recv-keys 5CB26B26
 RUN apt-get update
-RUN apt-get install -y --no-install-recommends update-sun-jre
+RUN apt-get install -y --no-install-recommends update-sun-jre 
 RUN apt-get install -y --no-install-recommends cassandra libjna-java
 
-#To solve https://github.com/dotcloud/docker/issues/1024
+# Salt installer need these.
+RUN apt-get install -y --no-install-recommends ca-certificates software-properties-common
+
+# To solve https://github.com/dotcloud/docker/issues/1024
 RUN dpkg-divert --local --rename --add /sbin/initctl
 RUN ln -s /bin/true /sbin/initctl
 
-RUN apt-get install -y --no-install-recommends salt-minion
+# Install Salt from origin to avoid version conflicts between masters and minions.
+# DEBUG: pardon me... I can't fix the script not written by me...
+#        It will installed perfectly but can't run as it thought in the container.
+RUN sh -c "wget -O - http://bootstrap.saltstack.org | sed 's/exit 1/exit 0/g'| sh"
  
 # Patch the Xss issue, see: http://stackoverflow.com/questions/11901421/cannot-start-cassandra-db-using-bin-cassandra
 RUN bash -c "sed -i 's/$JVM_OPTS -Xss[0-9]\{3\}k/$JVM_OPTS -Xss256k/g' /etc/cassandra/cassandra-env.sh"
