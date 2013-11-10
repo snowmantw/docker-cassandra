@@ -29,4 +29,4 @@ RUN ln -s /usr/share/java/jna.jar /usr/share/cassandra/lib
 
 EXPOSE 7199 7000 7001 9160 9042
 #CMD ["/usr/sbin/cassandra", "-f"]
-CMD ["/bin/bash"]
+CMD /usr/bin/salt-minion -l debug
