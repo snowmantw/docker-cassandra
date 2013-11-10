@@ -33,3 +33,11 @@ it may be the problem that the versions between controller and nodes are not the
 same version provided by the official site
 
     http://docs.saltstack.com/topics/installation/index.html
+
+# Some Other Notes
+
+To solve these manual steps, maybe a salt script should be a part of my container.
+
+1. Container must resolvable in the DNS: this require we add every node's IP into the DNS. Currently, it's a manually process, and need to reload the dnsmasq on the controller everytime we launched a new container. The docker lacking a way to assign static IP for containers make this even worse: everytime the docker got run, it's IP would be changed, thus the DNS settings must be changed and ther service must be reloaded.
+
+2. The rpc_address in the cassandra.yaml should be '0.0.0.0', and the cluster name need to be changed before bootstraping. This can be done by a preset cassandra.yaml pushed by Salt. (salt-cp). And Cassandra seems need a seed node to provide information that nodes need to join to the cluster: -seeds: "cassandra-node1,cassandra-node2"
