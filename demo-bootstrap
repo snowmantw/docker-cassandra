@@ -1,0 +1,6 @@
+#!/bin/bash
+
+HOSTPOSTFIX=$1
+HOSTPREFIX=cassandra
+CONTROLLER=`/sbin/ifconfig docker | grep 'inet addr:' | cut -d: -f2 | awk '{ print $1}'`
+sudo docker run -h $HOSTPREFIX-$HOSTPOSTFIX -dns $CONTROLLER -dns 168.95.1.1 -i -t snowmantw/cassandra
